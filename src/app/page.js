@@ -7,14 +7,55 @@ export default function Home() {
   const [scrollY, setScrollY] = useState(0);
   const [artwork5ImageIndex, setArtwork5ImageIndex] = useState(0);
   const [artwork2Hovered, setArtwork2Hovered] = useState(false);
+  const [hideHeroOnMobile, setHideHeroOnMobile] = useState(false);
+  const [contactSectionTop, setContactSectionTop] = useState(0);
 
   useEffect(() => {
+    const measureContactTop = () => {
+      const el = document.getElementById('contact');
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        setContactSectionTop(top);
+      }
+    };
+
     const handleScroll = () => {
       setScrollY(window.scrollY);
+      const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+      if (!isDesktop) {
+        // Hide hero when the viewport bottom reaches the About section (with small offset)
+        const viewportBottom = window.scrollY + window.innerHeight;
+        const threshold = contactSectionTop > 0 ? contactSectionTop - 24 : document.documentElement.scrollHeight - 12;
+        setHideHeroOnMobile(viewportBottom >= threshold);
+      } else if (hideHeroOnMobile) {
+        setHideHeroOnMobile(false);
+      }
     };
+
+    // Initial measure and listeners
+    measureContactTop();
+    window.addEventListener('resize', measureContactTop);
+    window.addEventListener('orientationchange', measureContactTop);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+
+    // Re-measure after images load (gallery images may shift layout)
+    const images = Array.from(document.images || []);
+    let pending = images.length;
+    images.forEach(img => {
+      if (img.complete) {
+        pending -= 1;
+      } else {
+        img.addEventListener('load', measureContactTop, { once: true });
+      }
+    });
+    if (pending === 0) measureContactTop();
+
+    return () => {
+      window.removeEventListener('resize', measureContactTop);
+      window.removeEventListener('orientationchange', measureContactTop);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [contactSectionTop, hideHeroOnMobile]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -62,7 +103,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative overflow-x-hidden">
       {/* Fixed Video Background Section */}
       <section className="relative min-h-screen flex items-center justify-center bg-black overflow-hidden">
         {/* Background Video - Fixed */}
@@ -79,7 +120,7 @@ export default function Home() {
         
         {/* Hero Content - Enhanced Parallax */}
         <div 
-          className="fixed inset-0 z-10 flex items-center justify-center text-white text-center px-4 pointer-events-none"
+          className={`fixed inset-0 z-10 flex items-center justify-center text-white text-center px-4 pointer-events-none transition-opacity duration-300 ${hideHeroOnMobile ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
           style={{
             transform: `translateY(-${scrollY * 0.03}px)`, // 3% parallax effect
           }}
@@ -91,13 +132,13 @@ export default function Home() {
               width={400}
               height={200}
               priority
-              className="drop-shadow-lg mx-auto"
+              className="drop-shadow-lg/10 mx-auto opacity-85 md:opacity-95"
               style={{
                 marginBottom: '1.5rem',
               }}
             />
             
-            <p className="mt-[3.3rem] mb-2 max-w-xl mx-auto text-xs font-light drop-shadow-md">
+            <p className="mt-[3rem] mb-2 max-w-xl mx-auto text-[11px] md:text-xs font-light drop-shadow-md">
               be<i>auty</i> <span className="tracking-[-0.15em]">———————————</span> curiosity <span className="tracking-[-0.15em]">———————————</span> <i>flaír.</i>
             </p>
           </div>
@@ -105,7 +146,7 @@ export default function Home() {
       </section>
 
       {/* Scrolling Gallery Section */}
-      <section className="relative z-20 bg-stone-100 h-[280vh] -mt-18">
+      <section className="relative z-20 bg-stone-100 h-auto min-h-[120vh] md:h-[280vh] mt-[100vh] md:-mt-18 w-screen overflow-x-hidden">
         {/* Content Container */}
         <div className="max-w-6xl mx-auto px-6 py-8">
           {/* Section Header */}
@@ -118,7 +159,7 @@ export default function Home() {
               <div className="flex-1 flex justify-center">
                 <a 
                   href="#gallery" 
-                  className="text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-normal transition-all duration-300 italic relative group tracking-tight"
+                  className="text-xs md:text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-[0.01em] transition-all duration-300 italic relative group tracking-tight whitespace-nowrap"
                   style={{
                     textDecoration: 'none'
                   }}
@@ -138,10 +179,10 @@ export default function Home() {
               </div>
               
               {/* Right link - extends to screen edge */}
-              <div className="flex-1 flex justify-end pr-6">
+              <div className="flex-1 flex justify-end mr-[-24px]">
                 <a 
                   href="#contact" 
-                  className="text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-wider transition-all duration-300 italic relative group tracking-tight"
+                  className="text-xs md:text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-wider transition-all duration-300 italic relative group tracking-tight whitespace-nowrap"
                   style={{
                     textDecoration: 'none'
                   }}
@@ -281,31 +322,27 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
+        </div>
+      </section>
 
-       {/* About Section */}
-          <div id="contact" className="text-center pt-8 pb-3 border-t border-[#F5F5F4]">
-            <p className="text-lg text-white max-w-3xl mx-auto leading-relaxed text-sm mb-6 pt-3">
+      {/* About Section (separate, transparent to reveal video) */}
+      <section className="relative z-20 bg-transparent w-screen overflow-x-hidden pb-9 md:pb-7 pt-px">
+        <div className="max-w-6xl mx-auto px-6">
+          <div id="contact" className="text-center pt-8">
+            <p className="text-lg text-[#f5f5f4] max-w-3xl mx-auto leading-relaxed text-sm mb-6 pt-3">
             A STUDIO BY ANNE is a practice shaped by inquiry and context, and a deep appreciation for beauty and order.
 We teach art to the young, and craft paintings that complete the spaces they inhabit.
 Rooted in technique and research, our work sits at the intersection of learning and experimentation.
 From imparting knowledge to bespoke commissions, we continue to make art that feels personal, intentional, and exquisitely made.
             </p>
-            <div className="flex flex-row items-center justify-center space-x-1.5">
+            <div className="flex flex-col md:flex-row items-center justify-center md:space-x-1.5 space-y-2 md:space-y-0 px-6 pb-4">
               <a href="https://wa.me/6588748388" target="_blank" rel="noopener noreferrer">
-                <button className="w-80 px-16 py-3 text-base border border-white text-white bg-transparent hover:bg-stone-100 hover:text-black transition-colors duration-300 mt-2 cursor-pointer">
-                  Contact for Classes
+                <button className="w-full md:w-80 px-16 py-3 text-base border border-[#f5f5f4] text-white bg-transparent hover:bg-stone-100 hover:text-black transition-colors duration-300 mt-2 cursor-pointer">
+                  &nbsp;Contact for Classes&nbsp;
                 </button>
               </a>
               <a href="https://wa.me/6588748388" target="_blank" rel="noopener noreferrer">
-                <button className="w-80 px-16 py-3 text-base border border-black text-white bg-black hover:bg-white/80 hover:text-black hover:border-white/60 transition-colors duration-300 mt-2 cursor-pointer">
+                <button className="w-full md:w-80 px-16 py-3 text-base border border-black text-[#f5f5f4] bg-black hover:bg-white/80 hover:text-black hover:border-white/60 transition-colors duration-300 mt-2 cursor-pointer">
                   Bespoke &nbsp;<i>/</i>&nbsp; Preorder
                 </button>
               </a>
