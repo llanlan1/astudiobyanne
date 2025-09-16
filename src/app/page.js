@@ -101,7 +101,7 @@ export default function Home() {
                style={{
                  marginTop: '4rem',
                }}>
-              be<i>auty</i> ————— curiosity ————— <i>flaír.</i>
+              be<i>auty</i> <span className="tracking-tight">—————</span> curiosity <span className="tracking-tight">—————</span> <i>flaír.</i>
             </p>
           </div>
         </div>
@@ -309,7 +309,7 @@ From imparting knowledge to bespoke commissions, we continue to make art that fe
               </a>
               <a href="https://wa.me/6588748388" target="_blank" rel="noopener noreferrer">
                 <button className="w-80 px-16 py-3 text-base border border-black text-white bg-black hover:bg-white/80 hover:text-black hover:border-white/60 transition-colors duration-300 mt-2 cursor-pointer">
-                  Preorder Art <i>/</i> Commission
+                  Bespoke and Preorder
                 </button>
               </a>
             </div>
