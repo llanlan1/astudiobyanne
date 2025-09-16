@@ -97,11 +97,8 @@ export default function Home() {
               }}
             />
             
-            <p className="mt-4 max-w-xl mx-auto text-base font-light drop-shadow-md"
-               style={{
-                 marginTop: '4rem',
-               }}>
-              be<i>auty</i> <span className="tracking-tight">—————</span> curiosity <span className="tracking-tight">—————</span> <i>flaír.</i>
+            <p className="mt-[3.3rem] mb-2 max-w-xl mx-auto text-xs font-light drop-shadow-md">
+              be<i>auty</i> <span className="tracking-[-0.15em]">———————————</span> curiosity <span className="tracking-[-0.15em]">———————————</span> <i>flaír.</i>
             </p>
           </div>
         </div>
@@ -136,7 +133,7 @@ export default function Home() {
                   }}
                 >
                   Explore our works
-                  <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gray-600 group-hover:w-11/12 group-hover:bg-gray-800 transition-all duration-300"></div>
+                  <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gray-600 group-hover:w-11/12 group-hover:bg-gray-800 transition-all duration-300 group-hover:tracking-widest"></div>
                 </a>
               </div>
               
@@ -144,7 +141,7 @@ export default function Home() {
               <div className="flex-1 flex justify-end pr-6">
                 <a 
                   href="#contact" 
-                  className="text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-normal transition-all duration-300 italic relative group tracking-tight"
+                  className="text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-wider transition-all duration-300 italic relative group tracking-tight"
                   style={{
                     textDecoration: 'none'
                   }}
@@ -177,7 +174,7 @@ export default function Home() {
                   height={400}
                   className="w-full h-full object-cover transition-all duration-300"
                 />
-                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-500 delay-300"></div>
               </div>
               <div className="pt-4 pb-4 pr-4 text-left">
                 <h2 className="text-2xl text-gray-800 mb-1">Expressive Watercolour</h2>
@@ -217,9 +214,9 @@ export default function Home() {
                   alt="Still Life - Orchids by Christina"
                   width={400}
                   height={400}
-                  className="w-full h-full object-cover object-left group-hover:scale-105 transition-all duration-500"
+                  className="w-full h-full object-cover object-left group-hover:scale-105 transition-all duration-500 delay-300"
                 />
-                <div className="absolute inset-0 bg-black opacity-13 group-hover:opacity-10 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-black opacity-13 group-hover:opacity-10 transition-opacity duration-300 delay-400"></div>
               </div>
               <div className="pt-4 pb-4 pr-4 text-left">
                 <h2 className="text-2xl text-gray-800 mb-1">Still Life Arrangement</h2>
@@ -237,7 +234,7 @@ export default function Home() {
                     alt="Yellow Cattelya by Arthur and Victoria"
                     width={400}
                     height={400}
-                    className="w-full h-full object-cover group-hover:object-contain transition-all duration-300 group-hover:brightness-90"
+                    className="w-full h-full object-cover group-hover:object-contain transition-all duration-300 delay-200 group-hover:brightness-90"
                   />
                 </div>
               </div>
@@ -274,7 +271,7 @@ export default function Home() {
                   alt="Nature — Illustrated by Anne"
                   width={400}
                   height={400}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 delay-100"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 group-hover:delay-400"
                 />
               </div>
               <div className="pt-4 pb-4 pr-4 text-left">
@@ -294,8 +291,8 @@ export default function Home() {
           <br />
 
        {/* About Section */}
-          <div id="contact" className="text-center py-8 border-t border-white">
-            <p className="text-lg text-white max-w-3xl mx-auto leading-relaxed text-sm mb-6 mt-0">
+          <div id="contact" className="text-center pt-8 pb-3 border-t border-[#F5F5F4]">
+            <p className="text-lg text-white max-w-3xl mx-auto leading-relaxed text-sm mb-6 pt-3">
             A STUDIO BY ANNE is a practice shaped by inquiry and context, and a deep appreciation for beauty and order.
 We teach art to the young, and craft paintings that complete the spaces they inhabit.
 Rooted in technique and research, our work sits at the intersection of learning and experimentation.
@@ -309,7 +306,7 @@ From imparting knowledge to bespoke commissions, we continue to make art that fe
               </a>
               <a href="https://wa.me/6588748388" target="_blank" rel="noopener noreferrer">
                 <button className="w-80 px-16 py-3 text-base border border-black text-white bg-black hover:bg-white/80 hover:text-black hover:border-white/60 transition-colors duration-300 mt-2 cursor-pointer">
-                  Bespoke / Preorder
+                  Bespoke &nbsp;<i>/</i>&nbsp; Preorder
                 </button>
               </a>
             </div>
