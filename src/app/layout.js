@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Playfair_Display } from "next/font/google";
 
 export const metadata = {
   title: "A STUDIO BY ANNE",
@@ -6,19 +7,16 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const playfair = Playfair_Display({
+    subsets: ["latin"],
+    weight: ["300", "400", "700"],
+    display: "swap",
+  });
   return (
     <html lang="en">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+      <head></head>
       <body
-        className="antialiased"
-        style={{
-          fontFamily: 'Arial, Helvetica, sans-serif',
-        }}
+        className={`antialiased ${playfair.className}`}
       >
         {children}
       </body>
