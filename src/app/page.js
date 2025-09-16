@@ -181,7 +181,7 @@ export default function Home() {
               </div>
               <div className="pt-4 pb-4 pr-4 text-left">
                 <h2 className="text-2xl text-gray-800 mb-1">Expressive Watercolour</h2>
-                <p className="text-2xl text-gray-600">Landscape—A 'Portrait' of Winter</p>
+                <p className="text-2xl text-gray-600">Landscape—A &lsquo;Portrait&rsquo; of Winter</p>
                 <p className="text-sm text-gray-400 mt-3">Made by Jordan, 6+, Watercolour</p>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function Home() {
               </div>
               <div className="pt-4 pb-4 pr-4 text-left">
                 <h2 className="text-2xl text-gray-800 mb-1">Floral Impressionism</h2>
-                <p className="text-2xl text-gray-600">A Study of Latour's Painting</p>
+                <p className="text-2xl text-gray-600">A Study of Latour&#39;s Painting</p>
                 <p className="text-sm text-gray-400 mt-3">Made by Anne, 2023, Acrylic</p>
               </div>
             </div>
