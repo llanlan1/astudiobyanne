@@ -102,6 +102,39 @@ export default function Home() {
     '/artwork2b.jpg'
   ];
 
+  // Custom smooth scroll function with easing
+  const smoothScrollTo = (targetId, duration = 1500, offset = 0) => {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
+    const startPosition = window.scrollY;
+    const distance = targetPosition - startPosition;
+    let startTime = null;
+
+    // Easing function for smooth deceleration
+    const easeOutCubic = (t) => {
+      return 1 - Math.pow(1 - t, 3);
+    };
+
+    const animation = (currentTime) => {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+
+      const easedProgress = easeOutCubic(progress);
+      const currentPosition = startPosition + (distance * easedProgress);
+
+      window.scrollTo(0, currentPosition);
+
+      if (progress < 1) {
+        requestAnimationFrame(animation);
+      }
+    };
+
+    requestAnimationFrame(animation);
+  };
+
   return (
     <div className="relative overflow-x-hidden">
       {/* Fixed Video Background Section */}
@@ -166,10 +199,7 @@ export default function Home() {
                   onClick={(e) => {
                     e.preventDefault();
                     setTimeout(() => {
-                      document.getElementById('gallery').scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start'
-                      });
+                      smoothScrollTo('gallery', 1200, 60);
                     }, 300);
                   }}
                 >
@@ -182,17 +212,14 @@ export default function Home() {
               <div className="flex-1 flex justify-end mr-[-24px]">
                 <a 
                   href="#contact" 
-                  className="text-xs md:text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-wider transition-all duration-300 italic relative group tracking-tight whitespace-nowrap"
+                  className="text-xs md:text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-[0.01em] transition-all duration-300 italic relative group tracking-tight whitespace-nowrap"
                   style={{
                     textDecoration: 'none'
                   }}
                   onClick={(e) => {
                     e.preventDefault();
                     setTimeout(() => {
-                      document.getElementById('contact').scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start'
-                      });
+                      smoothScrollTo('contact', 2000);
                     }, 300);
                   }}
                 >
