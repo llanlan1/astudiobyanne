@@ -229,7 +229,7 @@ export default function Home() {
           <div className="mb-32 -mt-4 relative w-full">
             <div className="flex justify-between items-center w-full px-6">
               {/* Empty div for left spacing */}
-              <div className="flex-1"></div>
+              <div className="flex-1 -ml-2.5"></div>
               
               {/* Center link - constrained to max-width */}
               <div className="flex-1 flex justify-center">
