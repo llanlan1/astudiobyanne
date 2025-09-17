@@ -7,11 +7,11 @@ import { useEffect, useState } from 'react';
 const SCROLL_CONFIG = {
   DURATION: {
     DEFAULT: 2000,
-    GALLERY: 1000,
+    GALLERY: 2000,
     CONTACT: 4000
   },
   OFFSET: {
-    GALLERY: 60,
+    GALLERY: 58,
     CONTACT: 0
   },
   PARALLAX: {
@@ -156,6 +156,8 @@ export default function Home() {
     const startPosition = window.scrollY;
     const distance = targetPosition - startPosition;
     let startTime = null;
+    let isAnimating = true;
+    let lastTimeElapsed = 0;
 
     // Easing functions
     const easeOutCubic = (t) => {
@@ -167,9 +169,33 @@ export default function Home() {
       return 1 - Math.pow(1 - t, 9);
     };
 
+    // Detect manual scroll interruption
+    const handleScrollInterrupt = () => {
+      const currentScroll = window.scrollY;
+      const progress = Math.min(lastTimeElapsed / duration, 1);
+      const easedProgress = useExtraSlowEasing ? easeOutQuint(progress) : easeOutCubic(progress);
+      const expectedPosition = startPosition + (distance * easedProgress);
+
+      // If user scrolled significantly away from expected position, stop animation
+      if (Math.abs(currentScroll - expectedPosition) > 50) {
+        isAnimating = false;
+        window.removeEventListener('wheel', handleScrollInterrupt);
+        window.removeEventListener('touchmove', handleScrollInterrupt);
+      }
+    };
+
     const animation = (currentTime) => {
-      if (startTime === null) startTime = currentTime;
+      if (!isAnimating) return;
+
+      if (startTime === null) {
+        startTime = currentTime;
+        // Add listeners to detect manual scroll
+        window.addEventListener('wheel', handleScrollInterrupt, { passive: true });
+        window.addEventListener('touchmove', handleScrollInterrupt, { passive: true });
+      }
+
       const timeElapsed = currentTime - startTime;
+      lastTimeElapsed = timeElapsed;
       const progress = Math.min(timeElapsed / duration, 1);
 
       const easedProgress = useExtraSlowEasing ? easeOutQuint(progress) : easeOutCubic(progress);
@@ -179,6 +205,10 @@ export default function Home() {
 
       if (progress < 1) {
         requestAnimationFrame(animation);
+      } else {
+        // Animation complete, remove listeners
+        window.removeEventListener('wheel', handleScrollInterrupt);
+        window.removeEventListener('touchmove', handleScrollInterrupt);
       }
     };
 
@@ -188,20 +218,27 @@ export default function Home() {
   // Event handlers for navigation
   const handleGalleryScroll = (e) => {
     e.preventDefault();
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    const duration = isMobile ? SCROLL_CONFIG.DURATION.GALLERY * 1.5 : SCROLL_CONFIG.DURATION.GALLERY;
     setTimeout(() => {
-      smoothScrollTo('gallery', SCROLL_CONFIG.DURATION.GALLERY, SCROLL_CONFIG.OFFSET.GALLERY);
+      smoothScrollTo('gallery', duration, SCROLL_CONFIG.OFFSET.GALLERY);
     }, SCROLL_CONFIG.SMOOTH_SCROLL_DELAY);
   };
 
   const handleContactScroll = (e) => {
     e.preventDefault();
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    const duration = isMobile ? SCROLL_CONFIG.DURATION.CONTACT * 1.5 : SCROLL_CONFIG.DURATION.CONTACT;
     setTimeout(() => {
-      smoothScrollTo('contact', SCROLL_CONFIG.DURATION.CONTACT, SCROLL_CONFIG.OFFSET.CONTACT, true);
+      smoothScrollTo('contact', duration, SCROLL_CONFIG.OFFSET.CONTACT, true);
     }, SCROLL_CONFIG.SMOOTH_SCROLL_DELAY);
   };
 
   const handleArrowScroll = () => {
-    smoothScrollTo('gallery', SCROLL_CONFIG.DURATION.GALLERY, SCROLL_CONFIG.OFFSET.GALLERY);
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    const duration = isMobile ? SCROLL_CONFIG.DURATION.GALLERY * 1.5 : SCROLL_CONFIG.DURATION.GALLERY;
+    // No delay for arrow - immediate response
+    smoothScrollTo('gallery', duration, SCROLL_CONFIG.OFFSET.GALLERY);
   };
 
   // Style calculations
@@ -228,7 +265,7 @@ export default function Home() {
         
         {/* Scroll Down Arrow - Top Right */}
         <div
-          className={`fixed top-6 right-6 z-20 transition-opacity duration-500 ${heroVisibility}`}
+          className={`fixed top-6 right-4 md:right-6 z-20 transition-opacity duration-500 ${heroVisibility}`}
           style={{
             opacity: arrowOpacity,
           }}
