@@ -103,7 +103,7 @@ export default function Home() {
   ];
 
   // Custom smooth scroll function with easing
-  const smoothScrollTo = (targetId, duration = 1500, offset = 0) => {
+  const smoothScrollTo = (targetId, duration = 2000, offset = 0, useExtraSlowEasing = false) => {
     const target = document.getElementById(targetId);
     if (!target) return;
 
@@ -112,9 +112,14 @@ export default function Home() {
     const distance = targetPosition - startPosition;
     let startTime = null;
 
-    // Easing function for smooth deceleration
+    // Easing functions
     const easeOutCubic = (t) => {
       return 1 - Math.pow(1 - t, 3);
+    };
+
+    // Extra slow easing for contact scroll - extremely gradual at the end
+    const easeOutQuint = (t) => {
+      return 1 - Math.pow(1 - t, 7);
     };
 
     const animation = (currentTime) => {
@@ -122,7 +127,7 @@ export default function Home() {
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);
 
-      const easedProgress = easeOutCubic(progress);
+      const easedProgress = useExtraSlowEasing ? easeOutQuint(progress) : easeOutCubic(progress);
       const currentPosition = startPosition + (distance * easedProgress);
 
       window.scrollTo(0, currentPosition);
@@ -199,7 +204,7 @@ export default function Home() {
                   onClick={(e) => {
                     e.preventDefault();
                     setTimeout(() => {
-                      smoothScrollTo('gallery', 1200, 60);
+                      smoothScrollTo('gallery', 1000, 60);
                     }, 300);
                   }}
                 >
@@ -219,7 +224,7 @@ export default function Home() {
                   onClick={(e) => {
                     e.preventDefault();
                     setTimeout(() => {
-                      smoothScrollTo('contact', 2000);
+                      smoothScrollTo('contact', 3000, 0, true);
                     }, 300);
                   }}
                 >
