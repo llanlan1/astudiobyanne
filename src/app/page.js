@@ -156,8 +156,46 @@ export default function Home() {
           Your browser does not support the video tag.
         </video>
         
+        {/* Scroll Down Arrow - Top Right */}
+        <div
+          className={`fixed top-6 right-6 z-20 transition-opacity duration-500 ${hideHeroOnMobile ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
+          style={{
+            opacity: scrollY > 480 ? 0 : 1, // Fade out after scrolling 480px
+          }}
+        >
+          <div
+            onClick={() => smoothScrollTo('gallery', 1000, 60)}
+            className="cursor-pointer hover:opacity-70 transition-opacity duration-300 pointer-events-auto"
+          >
+            <svg
+              width="20"
+              height="40"
+              viewBox="0 0 20 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Vertical line */}
+              <line
+                x1="10"
+                y1="2"
+                x2="10"
+                y2="32"
+                stroke="#f5f5f4"
+                strokeWidth="1"
+              />
+              {/* Arrow head */}
+              <polyline
+                points="6,28 10,32 14,28"
+                stroke="#f5f5f4"
+                strokeWidth="1"
+                fill="none"
+              />
+            </svg>
+          </div>
+        </div>
+
         {/* Hero Content - Enhanced Parallax */}
-        <div 
+        <div
           className={`fixed inset-0 z-10 flex items-center justify-center text-white text-center px-4 pointer-events-none transition-opacity duration-300 ${hideHeroOnMobile ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
           style={{
             transform: `translateY(-${scrollY * 0.03}px)`, // 3% parallax effect
