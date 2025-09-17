@@ -3,6 +3,51 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
+// Scroll configuration constants
+const SCROLL_CONFIG = {
+  DURATION: {
+    DEFAULT: 2000,
+    GALLERY: 1000,
+    CONTACT: 4000
+  },
+  OFFSET: {
+    GALLERY: 60,
+    CONTACT: 0
+  },
+  PARALLAX: {
+    HERO: 0.03,
+    ARROW: 0.003
+  },
+  ARROW_FADE_THRESHOLD: 480,
+  SMOOTH_SCROLL_DELAY: 300
+};
+
+// Arrow component
+const DownArrowIcon = () => (
+  <svg
+    width="20"
+    height="40"
+    viewBox="0 0 20 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <line
+      x1="10"
+      y1="2"
+      x2="10"
+      y2="32"
+      stroke="#f5f5f4"
+      strokeWidth="1"
+    />
+    <polyline
+      points="6,28 10,32 14,28"
+      stroke="#f5f5f4"
+      strokeWidth="1"
+      fill="none"
+    />
+  </svg>
+);
+
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
   const [artwork5ImageIndex, setArtwork5ImageIndex] = useState(0);
@@ -103,7 +148,7 @@ export default function Home() {
   ];
 
   // Custom smooth scroll function with easing
-  const smoothScrollTo = (targetId, duration = 2000, offset = 0, useExtraSlowEasing = false) => {
+  const smoothScrollTo = (targetId, duration = SCROLL_CONFIG.DURATION.DEFAULT, offset = 0, useExtraSlowEasing = false) => {
     const target = document.getElementById(targetId);
     if (!target) return;
 
@@ -140,6 +185,31 @@ export default function Home() {
     requestAnimationFrame(animation);
   };
 
+  // Event handlers for navigation
+  const handleGalleryScroll = (e) => {
+    e.preventDefault();
+    setTimeout(() => {
+      smoothScrollTo('gallery', SCROLL_CONFIG.DURATION.GALLERY, SCROLL_CONFIG.OFFSET.GALLERY);
+    }, SCROLL_CONFIG.SMOOTH_SCROLL_DELAY);
+  };
+
+  const handleContactScroll = (e) => {
+    e.preventDefault();
+    setTimeout(() => {
+      smoothScrollTo('contact', SCROLL_CONFIG.DURATION.CONTACT, SCROLL_CONFIG.OFFSET.CONTACT, true);
+    }, SCROLL_CONFIG.SMOOTH_SCROLL_DELAY);
+  };
+
+  const handleArrowScroll = () => {
+    smoothScrollTo('gallery', SCROLL_CONFIG.DURATION.GALLERY, SCROLL_CONFIG.OFFSET.GALLERY);
+  };
+
+  // Style calculations
+  const heroTransform = `translateY(-${scrollY * SCROLL_CONFIG.PARALLAX.HERO}px)`;
+  const arrowTransform = `translateY(-${scrollY * SCROLL_CONFIG.PARALLAX.ARROW}px)`;
+  const arrowOpacity = scrollY > SCROLL_CONFIG.ARROW_FADE_THRESHOLD ? 0 : 1;
+  const heroVisibility = hideHeroOnMobile ? 'opacity-0 md:opacity-100' : 'opacity-100';
+
   return (
     <div className="relative overflow-x-hidden">
       {/* Fixed Video Background Section */}
@@ -158,47 +228,24 @@ export default function Home() {
         
         {/* Scroll Down Arrow - Top Right */}
         <div
-          className={`fixed top-6 right-6 z-20 transition-opacity duration-500 ${hideHeroOnMobile ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
+          className={`fixed top-6 right-6 z-20 transition-opacity duration-500 ${heroVisibility}`}
           style={{
-            opacity: scrollY > 480 ? 0 : 1, // Fade out after scrolling 480px
+            opacity: arrowOpacity,
           }}
         >
           <div
-            onClick={() => smoothScrollTo('gallery', 1000, 60)}
+            onClick={handleArrowScroll}
             className="cursor-pointer hover:opacity-70 transition-opacity duration-300 pointer-events-auto"
           >
-            <svg
-              width="20"
-              height="40"
-              viewBox="0 0 20 40"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* Vertical line */}
-              <line
-                x1="10"
-                y1="2"
-                x2="10"
-                y2="32"
-                stroke="#f5f5f4"
-                strokeWidth="1"
-              />
-              {/* Arrow head */}
-              <polyline
-                points="6,28 10,32 14,28"
-                stroke="#f5f5f4"
-                strokeWidth="1"
-                fill="none"
-              />
-            </svg>
+            <DownArrowIcon />
           </div>
         </div>
 
         {/* Hero Content - Enhanced Parallax */}
         <div
-          className={`fixed inset-0 z-10 flex items-center justify-center text-white text-center px-4 pointer-events-none transition-opacity duration-300 ${hideHeroOnMobile ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
+          className={`fixed inset-0 z-10 flex items-center justify-center text-white text-center px-4 pointer-events-none transition-opacity duration-300 ${heroVisibility}`}
           style={{
-            transform: `translateY(-${scrollY * 0.03}px)`, // 3% parallax effect
+            transform: heroTransform,
           }}
         >
           <div>
@@ -239,12 +286,7 @@ export default function Home() {
                   style={{
                     textDecoration: 'none'
                   }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setTimeout(() => {
-                      smoothScrollTo('gallery', 1000, 60);
-                    }, 300);
-                  }}
+                  onClick={handleGalleryScroll}
                 >
                   Explore our works
                   <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gray-600 group-hover:w-11/12 group-hover:bg-gray-800 transition-all duration-300 group-hover:tracking-widest"></div>
@@ -259,12 +301,7 @@ export default function Home() {
                   style={{
                     textDecoration: 'none'
                   }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setTimeout(() => {
-                      smoothScrollTo('contact', 4000, 0, true);
-                    }, 300);
-                  }}
+                  onClick={handleContactScroll}
                 >
                   Contact
                   <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gray-600 group-hover:w-11/12 group-hover:bg-gray-800 transition-all duration-300"></div>
