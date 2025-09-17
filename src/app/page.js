@@ -119,7 +119,7 @@ export default function Home() {
 
     // Extra slow easing for contact scroll - extremely gradual at the end
     const easeOutQuint = (t) => {
-      return 1 - Math.pow(1 - t, 7);
+      return 1 - Math.pow(1 - t, 9);
     };
 
     const animation = (currentTime) => {
@@ -224,7 +224,7 @@ export default function Home() {
                   onClick={(e) => {
                     e.preventDefault();
                     setTimeout(() => {
-                      smoothScrollTo('contact', 3000, 0, true);
+                      smoothScrollTo('contact', 4000, 0, true);
                     }, 300);
                   }}
                 >
