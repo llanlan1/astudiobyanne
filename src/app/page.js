@@ -172,33 +172,33 @@ export default function Home() {
         scroll-behavior: smooth;
       }
 
-      /* Desktop - Fast start, slow end */
+      /* Desktop - Much slower, smooth scrolling */
       @media (min-width: 768px) {
         html {
           scroll-behavior: smooth !important;
-          animation-timing-function: cubic-bezier(0.5, 0.0, 0.0, 1.0) !important;
-          transition-timing-function: cubic-bezier(0.5, 0.0, 0.0, 1.0) !important;
+          animation-timing-function: cubic-bezier(0.02, 0.0, 0.0, 1.0) !important;
+          transition-timing-function: cubic-bezier(0.02, 0.0, 0.0, 1.0) !important;
         }
 
         *, *::before, *::after {
           scroll-behavior: smooth !important;
-          animation-timing-function: cubic-bezier(0.5, 0.0, 0.0, 1.0) !important;
-          transition-timing-function: cubic-bezier(0.5, 0.0, 0.0, 1.0) !important;
+          animation-timing-function: cubic-bezier(0.02, 0.0, 0.0, 1.0) !important;
+          transition-timing-function: cubic-bezier(0.02, 0.0, 0.0, 1.0) !important;
         }
       }
 
-      /* Mobile - Much slower throughout */
+      /* Mobile - Much slower scrolling */
       @media (max-width: 767px) {
         html {
           scroll-behavior: smooth !important;
-          animation-timing-function: cubic-bezier(0.05, 0.0, 0.0, 1.0) !important;
-          transition-timing-function: cubic-bezier(0.05, 0.0, 0.0, 1.0) !important;
+          animation-timing-function: cubic-bezier(0.01, 0.0, 0.0, 1.0) !important;
+          transition-timing-function: cubic-bezier(0.01, 0.0, 0.0, 1.0) !important;
         }
 
         *, *::before, *::after {
           scroll-behavior: smooth !important;
-          animation-timing-function: cubic-bezier(0.05, 0.0, 0.0, 1.0) !important;
-          transition-timing-function: cubic-bezier(0.05, 0.0, 0.0, 1.0) !important;
+          animation-timing-function: cubic-bezier(0.01, 0.0, 0.0, 1.0) !important;
+          transition-timing-function: cubic-bezier(0.01, 0.0, 0.0, 1.0) !important;
         }
       }
 
@@ -478,12 +478,12 @@ Rooted in technique and research, our work sits at the intersection of learning 
 From imparting knowledge to bespoke commissions, we continue to make art that feels personal, intentional, and exquisitely made.
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center md:space-x-1.5 space-y-2 md:space-y-0 px-6 pb-4">
-              <a href="https://wa.me/6588748388" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/6588748388?text=Hi%20there%2C%20I%20would%20like%20to%20enquire%20about%20your%20art%20classes%20for%20age(s)%20" target="_blank" rel="noopener noreferrer">
                 <button className="w-full md:w-80 px-16 py-3 text-base border border-[#f5f5f4] text-white bg-transparent hover:bg-stone-100 hover:text-black transition-colors duration-300 mt-2 cursor-pointer">
                   &nbsp;Contact for Classes&nbsp;
                 </button>
               </a>
-              <a href="https://wa.me/6588748388" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/6588748388?text=Hi%20there%2C%20I%20am%20looking%20to%20purchase%20or%20commission%20an%20artwork%20from%20you.%20My%20requirements%2Fenquiries%20are%20as%20follow%3A%20" target="_blank" rel="noopener noreferrer">
                 <button className="w-full md:w-80 px-16 py-3 text-base border border-black text-[#f5f5f4] bg-black hover:bg-white/80 hover:text-black hover:border-white/60 transition-colors duration-300 mt-2 cursor-pointer">
                   Bespoke &nbsp;<i>/</i>&nbsp; Preorder
                 </button>
