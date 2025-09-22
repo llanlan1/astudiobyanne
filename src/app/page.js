@@ -1,14 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 // Scroll configuration constants
 const SCROLL_CONFIG = {
-  DURATION: {
-    DEFAULT: 2000,
-    GALLERY: 2000,
-    CONTACT: 4000
+  SPEED: {
+    GALLERY: 800, // pixels per second
+    CONTACT: 600  // pixels per second (slower for contact)
   },
   OFFSET: {
     GALLERY: 58,
@@ -18,8 +17,7 @@ const SCROLL_CONFIG = {
     HERO: 0.03,
     ARROW: 0.003
   },
-  ARROW_FADE_THRESHOLD: 480,
-  SMOOTH_SCROLL_DELAY: 300
+  ARROW_FADE_THRESHOLD: 480
 };
 
 // Arrow component
@@ -30,20 +28,23 @@ const DownArrowIcon = () => (
     viewBox="0 0 20 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    opacity="90"
   >
     <line
       x1="10"
       y1="2"
       x2="10"
-      y2="32"
+      y2="36"
       stroke="#f5f5f4"
       strokeWidth="1"
+      opacity="90"
     />
     <polyline
-      points="6,28 10,32 14,28"
+      points="6,32 10,36 14,32"
       stroke="#f5f5f4"
       strokeWidth="1"
       fill="none"
+      opacity="90"
     />
   </svg>
 );
@@ -54,6 +55,11 @@ export default function Home() {
   const [artwork2Hovered, setArtwork2Hovered] = useState(false);
   const [hideHeroOnMobile, setHideHeroOnMobile] = useState(false);
   const [contactSectionTop, setContactSectionTop] = useState(0);
+
+  // Refs for direct DOM access
+  const galleryLinkRef = useRef(null);
+  const contactLinkRef = useRef(null);
+  const arrowRef = useRef(null);
 
   useEffect(() => {
     const measureContactTop = () => {
@@ -102,6 +108,54 @@ export default function Home() {
     };
   }, [contactSectionTop, hideHeroOnMobile]);
 
+  // Direct DOM event listeners for immediate response
+  useEffect(() => {
+    const galleryLink = galleryLinkRef.current;
+    const contactLink = contactLinkRef.current;
+    const arrow = arrowRef.current;
+
+    const handleGalleryClick = (e) => {
+      e.preventDefault();
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      const offset = isMobile ? 40 : SCROLL_CONFIG.OFFSET.GALLERY;
+      smoothScrollTo('gallery', offset);
+    };
+
+    const handleContactClick = (e) => {
+      e.preventDefault();
+      smoothScrollTo('contact', SCROLL_CONFIG.OFFSET.CONTACT);
+    };
+
+    const handleArrowClick = (e) => {
+      e.preventDefault();
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      const offset = isMobile ? 40 : SCROLL_CONFIG.OFFSET.GALLERY;
+      smoothScrollTo('gallery', offset);
+    };
+
+    if (galleryLink) {
+      galleryLink.addEventListener('click', handleGalleryClick);
+    }
+    if (contactLink) {
+      contactLink.addEventListener('click', handleContactClick);
+    }
+    if (arrow) {
+      arrow.addEventListener('click', handleArrowClick);
+    }
+
+    return () => {
+      if (galleryLink) {
+        galleryLink.removeEventListener('click', handleGalleryClick);
+      }
+      if (contactLink) {
+        contactLink.removeEventListener('click', handleContactClick);
+      }
+      if (arrow) {
+        arrow.removeEventListener('click', handleArrowClick);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setArtwork5ImageIndex(prev => prev === 0 ? 1 : 0);
@@ -111,26 +165,50 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Apply smooth scrolling to the html element with slower timing
-    document.documentElement.style.scrollBehavior = 'smooth';
-    document.documentElement.style.scrollTimeline = 'auto';
-    
-    // Add custom CSS for slower scrolling
+    // CSS to control scroll speed for desktop and mobile
     const style = document.createElement('style');
     style.textContent = `
       html {
         scroll-behavior: smooth;
-        scroll-timeline: auto;
       }
-      * {
-        scroll-behavior: smooth;
+
+      /* Desktop - Fast start, slow end */
+      @media (min-width: 768px) {
+        html {
+          scroll-behavior: smooth !important;
+          animation-timing-function: cubic-bezier(0.5, 0.0, 0.0, 1.0) !important;
+          transition-timing-function: cubic-bezier(0.5, 0.0, 0.0, 1.0) !important;
+        }
+
+        *, *::before, *::after {
+          scroll-behavior: smooth !important;
+          animation-timing-function: cubic-bezier(0.5, 0.0, 0.0, 1.0) !important;
+          transition-timing-function: cubic-bezier(0.5, 0.0, 0.0, 1.0) !important;
+        }
+      }
+
+      /* Mobile - Much slower throughout */
+      @media (max-width: 767px) {
+        html {
+          scroll-behavior: smooth !important;
+          animation-timing-function: cubic-bezier(0.05, 0.0, 0.0, 1.0) !important;
+          transition-timing-function: cubic-bezier(0.05, 0.0, 0.0, 1.0) !important;
+        }
+
+        *, *::before, *::after {
+          scroll-behavior: smooth !important;
+          animation-timing-function: cubic-bezier(0.05, 0.0, 0.0, 1.0) !important;
+          transition-timing-function: cubic-bezier(0.05, 0.0, 0.0, 1.0) !important;
+        }
+      }
+
+      body {
+        scroll-behavior: smooth !important;
       }
     `;
     document.head.appendChild(style);
-    
+
     return () => {
-      // Clean up
-      document.documentElement.style.scrollBehavior = 'auto';
       if (style.parentNode) {
         style.parentNode.removeChild(style);
       }
@@ -147,99 +225,19 @@ export default function Home() {
     '/artwork2b.jpg'
   ];
 
-  // Custom smooth scroll function with easing
-  const smoothScrollTo = (targetId, duration = SCROLL_CONFIG.DURATION.DEFAULT, offset = 0, useExtraSlowEasing = false) => {
+  // Simple native smooth scroll
+  const smoothScrollTo = (targetId, offset = 0) => {
     const target = document.getElementById(targetId);
     if (!target) return;
 
     const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
-    const startPosition = window.scrollY;
-    const distance = targetPosition - startPosition;
-    let startTime = null;
-    let isAnimating = true;
-    let lastTimeElapsed = 0;
 
-    // Easing functions
-    const easeOutCubic = (t) => {
-      return 1 - Math.pow(1 - t, 3);
-    };
-
-    // Extra slow easing for contact scroll - extremely gradual at the end
-    const easeOutQuint = (t) => {
-      return 1 - Math.pow(1 - t, 9);
-    };
-
-    // Detect manual scroll interruption
-    const handleScrollInterrupt = () => {
-      const currentScroll = window.scrollY;
-      const progress = Math.min(lastTimeElapsed / duration, 1);
-      const easedProgress = useExtraSlowEasing ? easeOutQuint(progress) : easeOutCubic(progress);
-      const expectedPosition = startPosition + (distance * easedProgress);
-
-      // If user scrolled significantly away from expected position, stop animation
-      if (Math.abs(currentScroll - expectedPosition) > 50) {
-        isAnimating = false;
-        window.removeEventListener('wheel', handleScrollInterrupt);
-        window.removeEventListener('touchmove', handleScrollInterrupt);
-      }
-    };
-
-    const animation = (currentTime) => {
-      if (!isAnimating) return;
-
-      if (startTime === null) {
-        startTime = currentTime;
-        // Add listeners to detect manual scroll
-        window.addEventListener('wheel', handleScrollInterrupt, { passive: true });
-        window.addEventListener('touchmove', handleScrollInterrupt, { passive: true });
-      }
-
-      const timeElapsed = currentTime - startTime;
-      lastTimeElapsed = timeElapsed;
-      const progress = Math.min(timeElapsed / duration, 1);
-
-      const easedProgress = useExtraSlowEasing ? easeOutQuint(progress) : easeOutCubic(progress);
-      const currentPosition = startPosition + (distance * easedProgress);
-
-      window.scrollTo(0, currentPosition);
-
-      if (progress < 1) {
-        requestAnimationFrame(animation);
-      } else {
-        // Animation complete, remove listeners
-        window.removeEventListener('wheel', handleScrollInterrupt);
-        window.removeEventListener('touchmove', handleScrollInterrupt);
-      }
-    };
-
-    requestAnimationFrame(animation);
+    window.scrollTo({
+      top: targetPosition,
+      behavior: 'smooth'
+    });
   };
 
-  // Event handlers for navigation
-  const handleGalleryScroll = (e) => {
-    e.preventDefault();
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
-    const duration = isMobile ? SCROLL_CONFIG.DURATION.GALLERY * 1.5 : SCROLL_CONFIG.DURATION.GALLERY;
-    setTimeout(() => {
-      smoothScrollTo('gallery', duration, SCROLL_CONFIG.OFFSET.GALLERY);
-    }, SCROLL_CONFIG.SMOOTH_SCROLL_DELAY);
-  };
-
-  const handleContactScroll = (e) => {
-    e.preventDefault();
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
-    const duration = isMobile ? SCROLL_CONFIG.DURATION.CONTACT * 1.5 : SCROLL_CONFIG.DURATION.CONTACT;
-    setTimeout(() => {
-      smoothScrollTo('contact', duration, SCROLL_CONFIG.OFFSET.CONTACT, true);
-    }, SCROLL_CONFIG.SMOOTH_SCROLL_DELAY);
-  };
-
-  const handleArrowScroll = () => {
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
-    const duration = isMobile ? SCROLL_CONFIG.DURATION.GALLERY * 1.5 : SCROLL_CONFIG.DURATION.GALLERY;
-    // No delay for arrow - immediate response
-    smoothScrollTo('gallery', duration, SCROLL_CONFIG.OFFSET.GALLERY);
-  };
 
   // Style calculations
   const heroTransform = `translateY(-${scrollY * SCROLL_CONFIG.PARALLAX.HERO}px)`;
@@ -265,13 +263,13 @@ export default function Home() {
         
         {/* Scroll Down Arrow - Top Right */}
         <div
-          className={`fixed top-6 right-4 md:right-6 z-20 transition-opacity duration-500 ${heroVisibility}`}
+          className={`fixed top-5 right-2 md:top-6 md:right-6 z-20 transition-opacity duration-500 ${heroVisibility}`}
           style={{
             opacity: arrowOpacity,
           }}
         >
           <div
-            onClick={handleArrowScroll}
+            ref={arrowRef}
             className="cursor-pointer hover:opacity-70 transition-opacity duration-300 pointer-events-auto"
           >
             <DownArrowIcon />
@@ -313,17 +311,17 @@ export default function Home() {
           <div className="mb-32 -mt-4 relative w-full">
             <div className="flex justify-between items-center w-full px-6">
               {/* Empty div for left spacing */}
-              <div className="flex-1 -ml-2.5"></div>
+              <div className="flex-1 -ml-5"></div>
               
               {/* Center link - constrained to max-width */}
               <div className="flex-1 flex justify-center">
-                <a 
-                  href="#gallery" 
+                <a
+                  ref={galleryLinkRef}
+                  href="#gallery"
                   className="text-xs md:text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-[0.01em] transition-all duration-300 italic relative group tracking-tight whitespace-nowrap"
                   style={{
                     textDecoration: 'none'
                   }}
-                  onClick={handleGalleryScroll}
                 >
                   Explore our works
                   <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gray-600 group-hover:w-11/12 group-hover:bg-gray-800 transition-all duration-300 group-hover:tracking-widest"></div>
@@ -332,13 +330,13 @@ export default function Home() {
               
               {/* Right link - extends to screen edge */}
               <div className="flex-1 flex justify-end mr-[-24px]">
-                <a 
-                  href="#contact" 
+                <a
+                  ref={contactLinkRef}
+                  href="#contact"
                   className="text-xs md:text-sm text-gray-600 inline-block cursor-pointer hover:text-gray-800 hover:not-italic hover:tracking-[0.01em] transition-all duration-300 italic relative group tracking-tight whitespace-nowrap"
                   style={{
                     textDecoration: 'none'
                   }}
-                  onClick={handleContactScroll}
                 >
                   Contact
                   <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gray-600 group-hover:w-11/12 group-hover:bg-gray-800 transition-all duration-300"></div>
@@ -469,8 +467,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Section (separate, transparent to reveal video) */}
-      <section className="relative z-20 bg-transparent w-screen overflow-x-hidden pb-9 md:pb-7 pt-px">
+      {/* About Section */}
+      <section className="relative z-20 bg-transparent w-screen overflow-x-hidden pb-9 md:pb-0 pt-px">
         <div className="max-w-6xl mx-auto px-6">
           <div id="contact" className="text-center pt-8">
             <p className="text-lg text-[#f5f5f4] max-w-3xl mx-auto leading-relaxed text-sm mb-6 pt-3">
@@ -490,6 +488,11 @@ From imparting knowledge to bespoke commissions, we continue to make art that fe
                   Bespoke &nbsp;<i>/</i>&nbsp; Preorder
                 </button>
               </a>
+            </div>
+            <div className="mt-7 mb-3">
+              <p className="text-[10px] text-[#f5f5f4] text-center tracking-widest font-medium italic">
+                <span className="text-[8px] -mb-2">©</span> {new Date().getFullYear()} <span className="text-[8.5px]">A STUDIO BY ANNE</span>
+              </p>
             </div>
           </div>
         </div>
