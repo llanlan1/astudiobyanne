@@ -34,13 +34,13 @@ const DownArrowIcon = () => (
       x1="10"
       y1="2"
       x2="10"
-      y2="36"
+      y2="40"
       stroke="#f5f5f4"
       strokeWidth="1"
       opacity="90"
     />
     <polyline
-      points="6,32 10,36 14,32"
+      points="6,36 10,40 14,36"
       stroke="#f5f5f4"
       strokeWidth="1"
       fill="none"
@@ -263,7 +263,7 @@ export default function Home() {
         
         {/* Scroll Down Arrow - Top Right */}
         <div
-          className={`fixed top-5 right-2 md:top-6 md:right-6 z-20 transition-opacity duration-500 ${heroVisibility}`}
+          className={`fixed top-6.5 right-2 md:top-6 md:right-6 z-20 transition-opacity duration-500 ${heroVisibility}`}
           style={{
             opacity: arrowOpacity,
           }}
@@ -490,8 +490,8 @@ From imparting knowledge to bespoke commissions, we continue to make art that fe
               </a>
             </div>
             <div className="mt-7 mb-3">
-              <p className="text-[10px] text-[#f5f5f4] text-center tracking-widest font-medium italic">
-                <span className="text-[8px] -mb-2">©</span> {new Date().getFullYear()} <span className="text-[8.5px]">A STUDIO BY ANNE</span>
+              <p className="text-[9px] text-[#f5f5f4] text-center tracking-widest font-thin italic">
+                <span className="text-[7px] -mb-2">©</span> {new Date().getFullYear()} <span className="text-[7.5px]">A STUDIO BY ANNE</span>
               </p>
             </div>
           </div>
