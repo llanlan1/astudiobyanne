@@ -10,7 +10,7 @@ const SCROLL_CONFIG = {
     CONTACT: 600  // pixels per second (slower for contact)
   },
   OFFSET: {
-    GALLERY: 58,
+    GALLERY: 60,
     CONTACT: 0
   },
   PARALLAX: {
@@ -117,7 +117,7 @@ export default function Home() {
     const handleGalleryClick = (e) => {
       e.preventDefault();
       const isMobile = window.matchMedia('(max-width: 767px)').matches;
-      const offset = isMobile ? 40 : SCROLL_CONFIG.OFFSET.GALLERY;
+      const offset = isMobile ? 27 : SCROLL_CONFIG.OFFSET.GALLERY;
       smoothScrollTo('gallery', offset);
     };
 
@@ -129,7 +129,7 @@ export default function Home() {
     const handleArrowClick = (e) => {
       e.preventDefault();
       const isMobile = window.matchMedia('(max-width: 767px)').matches;
-      const offset = isMobile ? 40 : SCROLL_CONFIG.OFFSET.GALLERY;
+      const offset = isMobile ? 27 : SCROLL_CONFIG.OFFSET.GALLERY;
       smoothScrollTo('gallery', offset);
     };
 
@@ -165,45 +165,15 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // CSS to control scroll speed for desktop and mobile
+    // Disable default smooth scroll behavior to use custom implementation
     const style = document.createElement('style');
     style.textContent = `
       html {
-        scroll-behavior: smooth;
-      }
-
-      /* Desktop - Much slower, smooth scrolling */
-      @media (min-width: 768px) {
-        html {
-          scroll-behavior: smooth !important;
-          animation-timing-function: cubic-bezier(0.02, 0.0, 0.0, 1.0) !important;
-          transition-timing-function: cubic-bezier(0.02, 0.0, 0.0, 1.0) !important;
-        }
-
-        *, *::before, *::after {
-          scroll-behavior: smooth !important;
-          animation-timing-function: cubic-bezier(0.02, 0.0, 0.0, 1.0) !important;
-          transition-timing-function: cubic-bezier(0.02, 0.0, 0.0, 1.0) !important;
-        }
-      }
-
-      /* Mobile - Much slower scrolling */
-      @media (max-width: 767px) {
-        html {
-          scroll-behavior: smooth !important;
-          animation-timing-function: cubic-bezier(0.01, 0.0, 0.0, 1.0) !important;
-          transition-timing-function: cubic-bezier(0.01, 0.0, 0.0, 1.0) !important;
-        }
-
-        *, *::before, *::after {
-          scroll-behavior: smooth !important;
-          animation-timing-function: cubic-bezier(0.01, 0.0, 0.0, 1.0) !important;
-          transition-timing-function: cubic-bezier(0.01, 0.0, 0.0, 1.0) !important;
-        }
+        scroll-behavior: auto;
       }
 
       body {
-        scroll-behavior: smooth !important;
+        scroll-behavior: auto;
       }
     `;
     document.head.appendChild(style);
@@ -225,17 +195,60 @@ export default function Home() {
     '/artwork2b.jpg'
   ];
 
-  // Simple native smooth scroll
-  const smoothScrollTo = (targetId, offset = 0) => {
+  // Enhanced smooth scroll with ease-out quint easing
+  const smoothScrollTo = (targetId, offset = 0, duration = 2600) => {
     const target = document.getElementById(targetId);
     if (!target) return;
 
+    const startY = window.scrollY || window.pageYOffset;
     const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
+    const distance = targetPosition - startY;
+    const startTime = performance.now();
 
-    window.scrollTo({
-      top: targetPosition,
-      behavior: 'smooth'
-    });
+    // For contact section, use shorter duration and gentler easing to avoid abrupt landing
+    const isContactSection = targetId === 'contact';
+    const adjustedDuration = isContactSection ? 2000 : duration;
+
+    let animationId;
+    let userInterrupted = false;
+
+    // Listen for user scroll to cancel animation
+    const handleUserScroll = () => {
+      userInterrupted = true;
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+      window.removeEventListener('wheel', handleUserScroll);
+      window.removeEventListener('touchstart', handleUserScroll);
+    };
+
+    window.addEventListener('wheel', handleUserScroll, { passive: true });
+    window.addEventListener('touchstart', handleUserScroll, { passive: true });
+
+    // Ease-out quint for very gradual deceleration
+    function easeOutQuint(t) {
+      return 1 - Math.pow(1 - t, 5);
+    }
+
+    function step(currentTime) {
+      if (userInterrupted) return;
+
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / adjustedDuration, 1);
+      const easedProgress = easeOutQuint(progress);
+
+      window.scrollTo(0, startY + distance * easedProgress);
+
+      if (elapsedTime < adjustedDuration && !userInterrupted) {
+        animationId = requestAnimationFrame(step);
+      } else {
+        // Clean up listeners when animation completes
+        window.removeEventListener('wheel', handleUserScroll);
+        window.removeEventListener('touchstart', handleUserScroll);
+      }
+    }
+
+    animationId = requestAnimationFrame(step);
   };
 
 
@@ -246,7 +259,7 @@ export default function Home() {
   const heroVisibility = hideHeroOnMobile ? 'opacity-0 md:opacity-100' : 'opacity-100';
 
   return (
-    <div className="relative overflow-x-hidden">
+    <div className="relative overflow-x-hidden bg-black min-h-screen">
       {/* Fixed Video Background Section */}
       <section className="relative min-h-screen flex items-center justify-center bg-black overflow-hidden">
         {/* Background Video - Fixed */}
@@ -255,6 +268,8 @@ export default function Home() {
           loop
           muted
           playsInline
+          webkit-playsinline="true"
+          preload="auto"
           className="fixed top-0 left-0 w-full h-full object-cover z-0"
         >
           <source src="/videos/background.mp4" type="video/mp4" />
@@ -304,7 +319,7 @@ export default function Home() {
       </section>
 
       {/* Scrolling Gallery Section */}
-      <section className="relative z-20 bg-stone-100 h-auto min-h-[120vh] md:h-[280vh] mt-[100vh] md:-mt-18 w-screen overflow-x-hidden">
+      <section className="relative z-20 bg-stone-100 h-auto min-h-[120vh] md:h-[280vh] mt-[100vh] md:-mt-20 w-screen overflow-x-hidden">
         {/* Content Container */}
         <div className="max-w-6xl mx-auto px-6 py-8">
           {/* Section Header */}
